@@ -43,8 +43,6 @@ public class FlatButton extends Canvas{
                     // Default state
                     break;
                 case 1:
-                	System.out.println("Button enabled = " + getEnabled ());
-                	System.out.println("Button enabled = " + isEnabled ());
                     // Mouse over
                     break;
                 case 2:
