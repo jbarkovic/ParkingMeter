@@ -35,6 +35,7 @@ public class FlatButton extends Canvas{
             public void paintControl(PaintEvent e) {
                 Rectangle rect = ((Canvas) e.widget).getClientArea();
                 Color fillColor = getBackgroundColor();
+                Color borderColor = new Color (getDisplay (),Values.greenSecondary);
                 RGB fillRGB = fillColor.getRGB();
                 Color selectColor = new Color (e.display, fillRGB.red-20,fillRGB.green-20,fillRGB.blue-20);
                 switch (mouse) {

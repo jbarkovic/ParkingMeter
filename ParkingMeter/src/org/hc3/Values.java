@@ -6,12 +6,12 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
 public class Values {
-	static final int parkingRate = 15;
-	static String font = "Ubuntu";
-	static RGB greenPrimary = new RGB (50,255,160);
-	static RGB greenSecondary = new RGB (11,179,55);
-	private static RGB greenBackgroundUnEnabled = new RGB (153,196,165); 
-	private static RGB greenForegroundUnEnabled = new RGB (153,196,165); 
+	public static final int parkingRate = 15;
+	public static String font = "Ubuntu";
+	public static RGB greenPrimary = new RGB (50,255,160);
+	public static RGB greenSecondary = new RGB (11,179,55);
+	public static RGB greenBackgroundUnEnabled = new RGB (153,196,165); 
+	public static RGB greenForegroundUnEnabled = new RGB (153,196,165); 
 	public static Color defaultBackground (Display display) {
 		return display.getSystemColor(SWT.COLOR_WHITE);
 	}

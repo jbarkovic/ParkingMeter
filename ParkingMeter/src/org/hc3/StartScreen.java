@@ -52,9 +52,9 @@ public class StartScreen extends Fragment implements Updateable {
 		lblRefundInstructions.setText("Insert valid Ticket for refund, \n or purchase new ticket");
 		lblRefundInstructions.setBackground(Values.defaultBackground(getDisplay()));
 		lblRefundInstructions.setFont(Start.changeFontSize(this.getDisplay (),lblRefundInstructions.getFont(),24));
+		FlashingComposite buttonContainer = FlashingComposite.setUpFlashingSlot(sashForm);
 		
-		
-		FlatButton fltbtnPurchaseButton = new FlatButton(sashForm, SWT.CENTER);
+		FlatButton fltbtnPurchaseButton = new FlatButton(buttonContainer, SWT.CENTER);
 		fltbtnPurchaseButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent e) {
