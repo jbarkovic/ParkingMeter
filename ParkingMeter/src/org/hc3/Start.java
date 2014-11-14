@@ -142,7 +142,7 @@ public class Start {
 		cardInsertedFlag = 0; /* 0 => No Card, 1 => CardInsertedSignal, 2 => CardHeldByMachine*/ 
 		cardRefund = 0; /* In Cents*/
 		cashReturned += cashContained + cashInserted; /* In Cents*/
-		cashInserted = 0; /* Used only to signal that money has been inserted, In Cents */
+		
 		cashContained = 0;
 		
 		paymentDue = 0;

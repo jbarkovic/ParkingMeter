@@ -24,7 +24,8 @@ public class PaymentPanel extends Shell implements Updateable {
 	private SashForm sashFormCash;
 	private SashForm sashBills;
 	private SashForm sashCoins;
-	private Button btnCardButton;
+	private Button btnCardInsertButton;
+	private Button btnCardRemoveButton;
 	private Button btnTwentyDollars;
 	private Button btnTenDollars;
 	private Button btnFiveDollars;
@@ -69,7 +70,7 @@ public class PaymentPanel extends Shell implements Updateable {
 		sashForm.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		
 		//sashCashReturn = new 
-		cashReturnContainer = setUpFlashingSlot (sashForm);
+		cashReturnContainer = FlashingComposite.setUpFlashingSlot (sashForm);
 		cashReturnContainer.setBackground(Values.defaultBackground(getDisplay()));
 		
 		SashForm sashCashReturn = new SashForm(cashReturnContainer,SWT.VERTICAL);
@@ -105,7 +106,7 @@ public class PaymentPanel extends Shell implements Updateable {
 		
 		lblCashPanel = generateLabel(sashForm, SWT.SEPARATOR | SWT.HORIZONTAL);
 		
-		cardContainer = setUpFlashingSlot (sashForm);
+		cardContainer = FlashingComposite.setUpFlashingSlot (sashForm);
 		SashForm sashCard = new SashForm (cardContainer,SWT.VERTICAL);
 		sashCard.setBackground(Values.defaultBackground(getDisplay()));
 		
@@ -113,20 +114,34 @@ public class PaymentPanel extends Shell implements Updateable {
 		lblCardState.setText("CardState");
 		lblCardState.setFont(Start.changeFontSize(this.getDisplay (),lblCardState.getFont(),14));
 		
-		btnCardButton = new Button(sashCard, SWT.NONE);
-		btnCardButton.addMouseListener(new MouseAdapter() {
+		SashForm sashCardButtons = new SashForm (sashCard,SWT.HORIZONTAL);
+		btnCardInsertButton = new Button(sashCardButtons, SWT.NONE);
+		btnCardInsertButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent e) {
-				Start.cardInsertedFlag = 1;
+				if (Start.cardInsertedFlag != 2) {
+					Start.cardInsertedFlag = 1;
+				}
 			}
 		});
-		btnCardButton.setText("Toggle Card");
+		btnCardInsertButton.setText("Insert Card");
+		
+		btnCardRemoveButton = new Button(sashCardButtons, SWT.NONE);
+		btnCardRemoveButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				if (Start.cardInsertedFlag != 2) {
+					Start.cardInsertedFlag = 0;
+				}
+			}
+		});
+		btnCardRemoveButton.setText("Remove Card");
 		sashCard.setWeights(new int[] {1, 1});
 		
 		lblCashPanel = generateLabel(sashForm, SWT.SEPARATOR | SWT.HORIZONTAL);
 		
 
-		addCashContainer = setUpFlashingSlot (sashForm);
+		addCashContainer = FlashingComposite.setUpFlashingSlot (sashForm);
 		
 		sashFormCash = new SashForm(addCashContainer, SWT.VERTICAL);
 		sashFormCash.setBackground(Values.defaultBackground(getDisplay()));
@@ -281,9 +296,9 @@ public class PaymentPanel extends Shell implements Updateable {
 			cardState = "Card Error";
 			newEnabledState = true;
 		}
-		btnCardButton.setText(btnText);
+		//btnCardButton.setText(btnText);
 		lblCardState.setText("  Card State: " + "\t" + cardState);
-		if (btnCardButton.getEnabled() != newEnabledState) btnCardButton.setEnabled(newEnabledState);
+		//if (btnCardButton.getEnabled() != newEnabledState) btnCardButton.setEnabled(newEnabledState);
 	}
 	private Label generateLabel (Composite parent, int arg0) {		
 		Label out = new Label (parent,arg0);
@@ -294,14 +309,6 @@ public class PaymentPanel extends Shell implements Updateable {
 	@Override
 	protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components
-	}
-	private FlashingComposite setUpFlashingSlot (final Composite parent) {
-		FlashingComposite fc = new FlashingComposite (parent, SWT.NO_SCROLL,Values.defaultBackground(getDisplay()),new Color(getDisplay (), Values.greenSecondary));
-		FillLayout layout = new FillLayout ();		
-		layout.marginHeight = 15;
-		layout.marginWidth = 15;
-		fc.setLayout(layout);
-		return fc;
 	}
 	private class Button extends FlatButton {
 

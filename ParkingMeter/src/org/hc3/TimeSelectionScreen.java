@@ -67,7 +67,10 @@ public class TimeSelectionScreen extends Fragment implements Updateable {
 				}
 			}
 		});
-		SashForm sashFormTimeChoose = new SashForm(sashForm, SWT.NONE);
+		FlashingComposite buttonContainer = FlashingComposite.setUpFlashingSlot(sashForm);
+		SashForm sashFormTimeChoose = new SashForm(buttonContainer, SWT.NONE);
+
+		
 		sashFormTimeChoose.setBackground(Values.defaultBackground(getDisplay()));
 		//SashForm sashFormHours = new SashForm(sashFormTimeChoose, SWT.VERTICAL);
 		
@@ -104,7 +107,9 @@ public class TimeSelectionScreen extends Fragment implements Updateable {
 				Start.hours = Math.max(0, Start.hours);
 			}
 		});
-		FlatButton fltbtnCancel = new FlatButton(sashForm, SWT.CENTER);
+		buttonContainer = FlashingComposite.setUpFlashingSlot(sashForm);
+
+		FlatButton fltbtnCancel = new FlatButton(buttonContainer, SWT.CENTER);
 		fltbtnCancel.setSize(225, 59);
 		fltbtnCancel.addMouseListener(new MouseAdapter() {
 			@Override
