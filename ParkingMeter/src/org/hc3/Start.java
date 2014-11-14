@@ -30,7 +30,8 @@ public class Start {
 	protected static double paymentDue = 0;
 	
 	protected static Ticket insertedTicket = null;
-	private static Fragment composite;								
+	private static Fragment composite;
+	private static Fragment previousScreen;
 	
 	/**
 	 * Launch the application.
@@ -174,6 +175,14 @@ public class Start {
 	protected static void startCashPay () {
 		currentState = STATE.CASH_PAY;
 		switchScreens (new CashPayment (mainShell, SWT.NONE));
+	}
+	protected static void startErrorScreen () {
+		previousScreen = composite;
+		switchScreens (new ErrorMessage (mainShell, SWT.NONE, new String [] {"Please enter a nonzero\n time interval"}));
+	}
+	protected static void endErrorScreen (){
+		previousScreen = composite;
+		switchScreens (new TimeSelectionScreen (mainShell, SWT.NONE));
 	}
 	protected static void startCardPay () {
 		currentState = STATE.CARD_PAY;

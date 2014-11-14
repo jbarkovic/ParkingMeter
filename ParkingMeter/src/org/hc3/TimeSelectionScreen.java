@@ -58,8 +58,13 @@ public class TimeSelectionScreen extends Fragment implements Updateable {
 		fltbtnDone.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseUp(MouseEvent e) {
-				Start.paymentDue = Start.calculatePayment (new int [] {Start.hours,Start.minutes});
-				Start.startPayment();
+				if(Start.hours > 0 || Start.minutes > 0){
+					Start.paymentDue = Start.calculatePayment (new int [] {Start.hours,Start.minutes});
+					Start.startPayment();
+				}
+				else{
+					Start.startErrorScreen();
+				}
 			}
 		});
 		SashForm sashFormTimeChoose = new SashForm(sashForm, SWT.NONE);
@@ -99,7 +104,19 @@ public class TimeSelectionScreen extends Fragment implements Updateable {
 				Start.hours = Math.max(0, Start.hours);
 			}
 		});
-		sashFormHours.setWeights(new int[] {2, 4,3,4});
+		FlatButton fltbtnCancel = new FlatButton(sashForm, SWT.CENTER);
+		fltbtnCancel.setSize(225, 59);
+		fltbtnCancel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				Start.leaveTransaction(false);
+			}
+		});
+		fltbtnCancel.setBackground(new Color (this.getDisplay(),50,255,160));
+		fltbtnCancel.setForeground(this.getDisplay ().getSystemColor(SWT.COLOR_WHITE));
+		fltbtnCancel.setText("Cancel");
+		fltbtnCancel.setFont(Start.changeFontSize(this.getDisplay (),fltbtnCancel.getFont(),26));
+		sashFormHours.setWeights(new int[] {2, 4, 3, 4});
 		
 		  // Create the SashForm
 	    Composite containerMinutes = new Composite(sashFormTimeChoose, SWT.NONE);
@@ -143,7 +160,7 @@ public class TimeSelectionScreen extends Fragment implements Updateable {
 		});
 		sashFormMinutes.setWeights(new int[] {2, 4,3,4});
 		sashFormTimeChoose.setWeights(new int[] {1, 1});
-		sashForm.setWeights(new int[] {3, 3, 3,7});
+		sashForm.setWeights(new int[] {3, 3, 3, 10, 3});
 
 	}
 	private FlatButton generateButton (Composite parent, String label) {		
@@ -163,8 +180,11 @@ public class TimeSelectionScreen extends Fragment implements Updateable {
 	public void updateItems() {
 		String label = String.format("Cost: %2.2f",Start.calculatePayment(new int [] {Start.hours,Start.minutes}));
 		lblCost.setText(label);
-		textMin.setText(Integer.toString(Start.minutes));
-		textHours.setText(Integer.toString(Start.hours));
-		textMin.setText(Integer.toString(Start.minutes));
+		if(!textMin.getText().equals(Integer.toString(Start.minutes))){
+			textMin.setText(Integer.toString(Start.minutes));
+		}
+		if(!textHours.getText().equals(Integer.toString(Start.hours))){
+			textHours.setText(Integer.toString(Start.hours));
+		}
 	}
 }
