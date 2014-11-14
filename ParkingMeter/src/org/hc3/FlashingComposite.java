@@ -25,7 +25,7 @@ public class FlashingComposite extends Composite {
 		Runnable timer = new Runnable() {
 	        public void run() {
 	        	if (executeTimer) toggleBackground ();
-	          if (isDisposed ()) arg0.getDisplay().timerExec(time, this);
+	        	if (!isDisposed ()) arg0.getDisplay().timerExec(time, this);
 	        }
 	      };
 	      arg0.getDisplay().timerExec(time, timer);
