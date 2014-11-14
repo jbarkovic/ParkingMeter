@@ -1,0 +1,418 @@
+<project name="HC3_Parking_Meter" basedir="." default="help">
+
+
+  <path id="findbugs.lib" >
+    <fileset dir="./lib/findbugs" includes="*.jar" />
+  </path>
+
+  <target name="help">
+    <java classname="org.apache.tools.ant.Main">
+      <arg value="-projecthelp" />
+    </java>
+  </target>
+
+
+
+  <target name="clean" description="Comile classes">
+    <delete dir="./build" />
+    <delete dir="./reports" />
+  </target>
+
+
+
+  <target name="build" description="Comile classes">
+    <mkdir dir="./build" />
+    <mkdir dir="./build/classes" />
+
+    <javac destdir="./build/classes" debug="true" source="1.6" target="1.6"
+           includeantruntime="false"> 
+      <src path="./src"/>
+      <classpath>
+        <fileset dir="./lib" includes="*.jar" />
+      </classpath>
+    </javac>
+  </target>
+
+
+
+  <target name="getgitdetails" >
+    <exec executable="git" outputproperty="git.tagstring">
+      <arg value="describe"/>
+    </exec>
+    <exec executable="git" outputproperty="git.revision">
+      <arg value="rev-parse"/>
+      <arg value="HEAD"/>
+    </exec>
+    <if>
+      <contains string="${git.tagstring}" substring="cannot"/>
+      <then>
+        <property name="git.tag" value="none"/>
+      </then>
+      <else>
+        <property name="git.tag" value="${git.tagstring}"/>
+      </else>
+    </if>
+  </target>
+
+
+
+  <target name="jar" description="Create Jars" depends="build" >
+
+    <mkdir dir="./build/tmp/" />    
+    <mkdir dir="./build/jars/" />
+
+    <!-- Agent -->
+    <jarjar jarfile="./build/jars/intrace-agent.jar">
+      <manifest>
+        <attribute name="Premain-Class" value="org.intrace.agent.Agent" />
+        <attribute name="Agent-Class" value="org.intrace.agent.Agent" />
+        <attribute name="Can-Retransform-Classes" value="true" />
+        <attribute name="Class-Path" value="." />
+        <attribute name="Git-Revision" value="${git.revision}" />
+        <attribute name="Implementation-Version" value="${git.tag}" />
+      </manifest>
+      <fileset dir="./build/classes" includes="**/agent/**/*.class" />
+      <fileset dir="./build/classes" includes="**/output/**/*.class" />
+      <fileset dir="./build/classes" includes="**/shared/*.class" />
+      <zipfileset excludes="META-INF/*.MF" src="./lib/asm-debug-all-3.3.jar"/>
+      <rule pattern="org.objectweb.asm.**" result="org.intrace.internal.objectweb.asm.@1"/>
+    </jarjar>
+    <copy file="./build/jars/intrace-agent.jar" todir="./lib/" />
+
+    <!-- UI (Cross platform SWT Jar (Windows/Linux)) -->
+    <swtjar jarfile="./build/jars/intrace-ui.jar"
+            targetmainclass="org.intrace.client.gui.InTraceStandaloneUI"
+            swtversion="4.3">
+      <manifest>
+        <attribute name="Git-Revision" value="${git.revision}" />
+        <attribute name="Implementation-Version" value="${git.tag}" />
+      </manifest>
+	  
+      <!-- InTrace classes -->
+      <fileset dir="./build/classes" includes="**/shared/*.class" />
+      <fileset dir="./build/classes" includes="**/client/gui/**/*.class" />
+	  
+      <!-- InTrace icons -->
+      <fileset dir="./src" includes="**/icons/**/*.*" />
+	  
+      <!-- Required Jars -->
+      <zipfileset excludes="META-INF/*.MF" src="lib/miglayout-core-4.2.jar"/>
+      <zipfileset excludes="META-INF/*.MF" src="lib/miglayout-swt-4.2.jar"/>
+	  
+      <!-- SWT Jars (Windows/Linux) -->
+      <fileset dir="./lib" includes="swt-win*-4.3.jar" />
+      <fileset dir="./lib" includes="swt-lin*-4.3.jar" />
+    </swtjar>
+	
+    <!-- UI (OSX SWT Jar) -->
+    <swtjar jarfile="./build/tmp/intrace-ui-osx.jar"
+            targetmainclass="org.intrace.client.gui.InTraceStandaloneUI"
+            swtversion="4.3">
+      <manifest>
+        <attribute name="Git-Revision" value="${git.revision}" />
+        <attribute name="Implementation-Version" value="${git.tag}" />
+      </manifest>
+	  
+      <!-- InTrace classes -->
+      <fileset dir="./build/classes" includes="**/shared/*.class" />
+      <fileset dir="./build/classes" includes="**/client/gui/**/*.class" />
+	  
+      <!-- InTrace icons -->
+      <fileset dir="./src" includes="**/icons/**/*.*" />
+	  
+      <!-- Required Jars -->
+      <zipfileset excludes="META-INF/*.MF" src="lib/miglayout-core-4.2.jar"/>
+      <zipfileset excludes="META-INF/*.MF" src="lib/miglayout-swt-4.2.jar"/>
+	  
+      <!-- SWT Jars (OSX) -->
+      <fileset dir="./lib" includes="swt-osx*-4.3.jar" />
+    </swtjar>
+	
+    <!-- UI (OSX application) -->
+    <mkdir dir="./build/tmp/InTraceApp/" />
+    <jarbundler dir="./build/tmp/InTraceApp/"
+                name="InTrace"
+                mainclass="org.swtjar.SWTLoader" 
+                jar="./build/tmp/intrace-ui-osx.jar" 
+                startOnMainThread="true" 
+                icon="./src/org/intrace/icons/intrace128.icns" 
+                stubfile="./lib/JavaApplicationStub" />
+    <delete file="./build/tmp/InTraceApp/InTrace.app/Contents/MacOS/JavaApplicationStub" />
+    <mkdir dir="./build/tmp/InTraceAppLauncher/InTrace.app/Contents/MacOS/" />
+    <copy file="./lib/JavaApplicationStub" 
+          todir="./build/tmp/InTraceAppLauncher/InTrace.app/Contents/MacOS/" />
+    <tar destfile="./build/jars/InTrace.app.tar">
+      <tarfileset dir="./build/tmp/InTraceAppLauncher/" filemode="777" />
+      <tarfileset dir="./build/tmp/InTraceApp/" />
+    </tar>
+
+    <!-- InTrace UI Library -->
+    <jar jarfile="./build/jars/intrace-ui-helper.jar">
+      <fileset dir="./build/classes" includes="**/shared/*.class" />
+      <fileset dir="./build/classes" includes="**/client/gui/helper/*.class" />
+      <fileset dir="./src" includes="**/icons/**/*.*" />
+    </jar>	
+  </target>
+
+  <target name="test" description="Run Tests" depends="build" >
+    <property name="emma.enabled" value="true" />
+
+    <mkdir dir="./reports" />
+    <mkdir dir="./reports/junit" />
+    <mkdir dir="./reports/junit/raw" />
+    <mkdir dir="./reports/emma" />
+    <mkdir dir="./reports/emma/metadata" />
+
+    <mkdir dir="./build/test" />
+    <mkdir dir="./build/classes_instr" />
+
+    <javac destdir="./build/test" debug="true" source="1.6" target="1.6"
+           includeantruntime="false">
+      <src path="./testsrc"/>
+      <classpath>
+        <pathelement path="./build/classes" />
+        <fileset dir="./lib" includes="*.jar" />
+      </classpath>
+    </javac>
+
+    <copy todir="./build/classes_instr">
+      <fileset dir="./build/classes"/>
+    </copy>
+
+    <emma enabled="${emma.enabled}" >
+      <instr instrpath="./build/classes_instr"
+             metadatafile="./reports/emma/metadata/metadata.emma"
+             merge="true"
+             mode="overwrite"
+      />
+    </emma>
+
+    <!-- Build agent with coverage instrumentation enabled -->    
+    <jar jarfile="./build/tmp/intrace-agent-instr.jar">
+      <manifest>
+        <attribute name="Premain-Class" value="org.intrace.agent.Agent" />
+        <attribute name="Agent-Class" value="org.intrace.agent.Agent" />
+        <attribute name="Can-Redefine-Classes" value="true" />
+        <attribute name="Class-Path" value="." />
+        <attribute name="Git-Revision" value="${git.revision}" />
+        <attribute name="Implementation-Version" value="${git.tag}" />
+      </manifest>
+      <fileset dir="./build/classes_instr" includes="**/agent/**/*.class" />
+      <fileset dir="./build/classes_instr" includes="**/output/**/*.class" />
+      <fileset dir="./build/classes_instr" includes="**/shared/*.class" />
+      <zipfileset excludes="META-INF/*.MF" src="./lib/asm-debug-all-3.3.jar"/>
+    </jar>
+
+    <junit printsummary="yes" failureproperty="test.failure">
+      <classpath>
+        <pathelement location="./build/test"/>        
+        <fileset dir="./lib" includes="*.jar" excludes="intrace*.jar" />
+        <path refid="emma.lib" />
+      </classpath>
+      <jvmarg value="-Demma.coverage.out.file=./reports/emma/metadata/coverage.emma" />
+      <jvmarg value="-Demma.coverage.out.merge=true" />
+      <jvmarg value="-javaagent:./build/tmp/intrace-agent-instr.jar"/>
+      <jvmarg value="-Xbootclasspath/a:./lib/emma.jar" />
+
+      <formatter type="xml"/>
+      <formatter type="plain"/>
+
+      <batchtest fork="yes" todir="./reports/junit/raw">
+        <fileset dir="./testsrc">
+          <include name="**/agent/*Test.java"/>
+        </fileset>
+      </batchtest>
+    </junit>
+    
+    <junit printsummary="yes" failureproperty="test.failure">
+      <classpath>
+        <pathelement location="./build/test"/>                
+        <pathelement location="./build/classes_instr"/>
+        <fileset dir="./lib" includes="*.jar" />
+        <path refid="emma.lib" />
+      </classpath>
+      <jvmarg value="-Demma.coverage.out.file=./reports/emma/metadata/coverage.emma" />
+      <jvmarg value="-Demma.coverage.out.merge=true" />
+
+      <formatter type="xml"/>
+      <formatter type="plain"/>
+
+      <batchtest fork="yes" todir="./reports/junit/raw">
+        <fileset dir="./testsrc">
+          <include name="**/gui/*Test.java"/>
+        </fileset>
+      </batchtest>
+    </junit>
+
+    <junitreport todir="./reports/junit">
+      <fileset dir="./reports/junit/raw">
+        <include name="TEST-*.xml"/>
+      </fileset>
+      <report format="frames" todir="./reports/junit/"/>
+    </junitreport>
+
+    <emma enabled="${emma.enabled}" >
+      <report sourcepath="./src" >
+        <fileset dir="./reports/emma/metadata/" >
+          <include name="*.emma" />
+        </fileset>
+
+        <txt outfile="./reports/emma/coverage.txt" />
+        <html outfile="./reports/emma/coverage.html" />
+      </report>
+    </emma>
+  </target>
+
+
+  <target name="findbugs" depends="build">
+
+    <mkdir dir="./reports/findbugs" />
+
+    <!-- Build Findbugs Trace Agent (Don't include ASM classes) -->
+    <jar destfile="./reports/findbugs/intrace-agent-findbugs.jar" compress="false">
+      <fileset dir="./build/classes" includes="**/agent/**/*.class" />
+      <fileset dir="./build/classes" includes="**/output/**/*.class" />
+      <fileset dir="./build/classes" includes="**/shared/*.class" />
+    </jar>
+
+    <findbugs home="${findbugs.home}"
+              output="xml"
+              outputFile="./reports/findbugs/intrace-agent-findbugs-results.xml"
+              excludeFilter="./conf/findbugs_exclude.xml"
+              reportLevel="low"
+              effort="max"
+              errorProperty="findbugs.errors"
+              warningsProperty="findbugs.warns"           
+              jvmargs="-Xmx256m">
+      <auxClasspath>
+        <fileset dir="./lib" includes="*.jar" />
+      </auxClasspath>
+      <sourcePath path="./src" />
+      <class location="./reports/findbugs/intrace-agent-findbugs.jar" />
+    </findbugs>
+        
+    <fail if="findbugs.errors">FindBugs: Errors found, please run "ant view-findbugs"</fail>
+    <fail if="findbugs.warns">FindBugs: Warnings found, please run "ant view-findbugs"</fail>
+
+  </target>
+
+  <target name="view-findbugs" description="View report generated by findbugs target">
+
+    <java jar="./lib/findbugs/findbugs.jar" fork="true">
+      <arg value="./reports/findbugs/intrace-agent-findbugs-results.xml"/>
+    </java>
+
+  </target>
+
+  <target name="validate" description="Build jars and run all automated tests" depends="jar, test, findbugs" >
+    <fail message="Tests failed" if="test.failure" />
+  </target>
+
+  <target name="release1" description="Validate InTrace and copy files ready for Eclipse build" depends="validate,update_eclipse_jars">
+    <copy todir="../binaries/jars/latest_development" overwrite="true">
+      <fileset file="./build/jars/intrace-agent.jar" />
+      <fileset file="./build/jars/intrace-ui.jar" />
+      <fileset file="./build/jars/InTrace.app.tar" />
+    </copy>
+    <delete>
+      <fileset dir="../intrace.appengine/war/features/" includes="*.jar"/>
+      <fileset dir="../intrace.appengine/war/plugins/" includes="*.jar"/>
+      <fileset dir="../intrace.ecl.site/features/" includes="*.jar"/>
+      <fileset dir="../intrace.ecl.site/plugins/" includes="*.jar"/>
+      <fileset dir="../intrace.ecl.site/" includes="artifacts.jar"/>
+      <fileset dir="../intrace.ecl.site/" includes="content.jar"/>
+    </delete>
+    <echo>****</echo>
+    <echo>****</echo>
+    <echo>Now run Build All in Eclipse for the intrace.ecl.site project</echo>
+    <echo>****</echo>
+    <echo>****</echo>
+  </target>
+
+  <target name="release1_dev" depends="jar,update_eclipse_jars">
+    <copy todir="../binaries/jars/latest_development" overwrite="true">
+      <fileset file="./build/jars/intrace-agent.jar" />
+      <fileset file="./build/jars/intrace-ui.jar" />
+      <fileset file="./build/jars/InTrace.app.tar" />
+    </copy>
+    <delete>
+      <fileset dir="../intrace.appengine/war/features/" includes="*.jar"/>
+      <fileset dir="../intrace.appengine/war/plugins/" includes="*.jar"/>
+      <fileset dir="../intrace.ecl.site/features/" includes="*.jar"/>
+      <fileset dir="../intrace.ecl.site/plugins/" includes="*.jar"/>
+    </delete>
+    <echo>****</echo>
+    <echo>****</echo>
+    <echo>Now run Build All in Eclipse for the intrace.ecl.site project</echo>
+    <echo>****</echo>
+    <echo>****</echo>
+  </target>
+
+  <target name="release2" description="Copy around built Eclipse files">
+    <copy todir="../intrace.appengine/war" overwrite="true">
+      <fileset dir="../intrace.ecl.site/" excludes="artifacts.jar,content.jar,.project"/>
+    </copy>
+
+    <delete file="../binaries/jars/latest_development/intrace.ecl.site.zip" />
+    <zip destfile="../binaries/jars/latest_development/intrace.ecl.site.zip"
+         basedir="../intrace.ecl.site/"
+         excludes=".project"
+    />
+    
+    <copy todir="../intrace.appengine/war/files" overwrite="true">
+      <fileset file="../binaries/jars/latest_development/intrace-agent.jar" />
+      <fileset file="../binaries/jars/latest_development/intrace-ui.jar" />
+      <fileset file="../binaries/jars/latest_development/InTrace.app.tar" />
+    </copy>
+  </target>
+
+  <target name="update_eclipse_jars" depends="jar" >
+    <copy todir="../intrace.ecl.plugin/lib/">
+      <fileset file="./build/jars/intrace-agent.jar" />
+      <fileset file="./build/jars/intrace-ui-helper.jar" />
+    </copy>
+  </target>
+
+  <target name="example_build">
+    <mkdir dir="./build/test" />
+    <javac destdir="./build/test" debug="true" source="1.6" target="1.6"
+           includeantruntime="false">
+      <src path="./testsrc"/>
+      <classpath>
+        <pathelement path="./build/classes" />
+        <fileset dir="./lib" includes="*.jar" />
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="example" depends="jar,example_build">
+    <java classname="example.TraceExample" fork="true">
+      <arg value="5000" />
+      <classpath>
+        <pathelement path="./build/test" />
+      </classpath>
+      <jvmarg value="-javaagent:build/jars/intrace-agent.jar=[instru-true" />
+    </java>
+  </target>
+
+  <target name="waitexample" depends="jar,example_build">
+    <java classname="example.TraceExample" fork="true">
+      <arg value="5000" />
+      <classpath>
+        <pathelement path="./build/test" />
+      </classpath>
+      <jvmarg value="-javaagent:build/jars/intrace-agent.jar=[instru-true[startwait" />
+    </java>
+  </target>
+
+  <target name="fastexample" depends="jar,example_build">
+    <java classname="example.TraceExample" fork="true">
+      <arg value="0" />
+      <classpath>
+        <pathelement path="./build/test" />
+      </classpath>
+      <jvmarg value="-javaagent:build/jars/intrace-agent.jar=[instru-true" />
+    </java>
+  </target>
+
+</project>
