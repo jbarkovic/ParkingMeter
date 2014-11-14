@@ -17,7 +17,7 @@ public class FlashingComposite extends Composite {
 	public  FlashingComposite (Composite arg0, int arg1) {
 		super(arg0, arg1);
 	}
-	public FlashingComposite (Composite arg0, int arg1, Color defaultBackground, Color alternate) {
+	public FlashingComposite (final Composite arg0, int arg1, Color defaultBackground, Color alternate) {
 		super(arg0, arg1);
 		defaultRGB = (defaultBackground != null) ? defaultBackground.getRGB() : this.getBackground().getRGB();
 		alternateRGB = alternate.getRGB();
@@ -25,10 +25,10 @@ public class FlashingComposite extends Composite {
 		Runnable timer = new Runnable() {
 	        public void run() {
 	        	if (executeTimer) toggleBackground ();
-	          getDisplay().timerExec(time, this);
+	          if (isDisposed ()) arg0.getDisplay().timerExec(time, this);
 	        }
 	      };
-	      getDisplay().timerExec(time, timer);
+	      arg0.getDisplay().timerExec(time, timer);
 	}
 	public void toggleBackground () {
 		if (getBackground ().getRGB().equals(defaultRGB)) {
