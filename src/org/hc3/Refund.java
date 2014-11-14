@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import widgets.FlatButton;
+import widgets.SashForm;
 
 public class Refund extends Fragment {
 

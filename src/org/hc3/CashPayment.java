@@ -9,6 +9,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import widgets.FlatButton;
+import widgets.SashForm;
+
 import org.eclipse.swt.widgets.Group;
 
 
@@ -25,9 +27,27 @@ public class CashPayment extends Fragment {
 		setLayout(new FillLayout(SWT.HORIZONTAL));
 		setBackground(Values.defaultBackground(getDisplay()));
 		
-		Group group = new Group(this, SWT.NONE);
+		SashForm group = new SashForm (this, SWT.VERTICAL);
 		
 		group.setLayout(new FillLayout ());
+		
+		Label lblTitle = new Label(group, SWT.NONE);
+		lblTitle.setSize(225, 300);
+		lblTitle.setAlignment(SWT.CENTER);
+		lblTitle.setFont(SWTResourceManager.getFont("Ubuntu", 26, SWT.NORMAL));
+		lblTitle.setText("Cash Payment");
+		lblTitle.setBackground(Values.defaultBackground(getDisplay()));
+		
+		lblBalance = new Label(group, SWT.LEFT);
+		lblBalance.setSize(225, 74);
+		lblBalance.setFont(Start.changeFontSize(this.getDisplay (),lblBalance.getFont(),22));
+		lblBalance.setBackground(Values.defaultBackground(getDisplay()));
+		
+		lblRequired = new Label(group, SWT.LEFT);
+		lblRequired.setSize(225, 100);
+		lblRequired.setFont(Start.changeFontSize(this.getDisplay (),lblRequired.getFont(),22));
+		lblRequired.setBackground(Values.defaultBackground(getDisplay()));
+
 		FlatButton fltbtnCancel = new FlatButton(group, SWT.CENTER);
 		fltbtnCancel.setSize(225, 59);
 		fltbtnCancel.addMouseListener(new MouseAdapter() {
@@ -40,22 +60,6 @@ public class CashPayment extends Fragment {
 		fltbtnCancel.setForeground(this.getDisplay ().getSystemColor(SWT.COLOR_WHITE));
 		fltbtnCancel.setText("Cancel");
 		fltbtnCancel.setFont(Start.changeFontSize(this.getDisplay (),fltbtnCancel.getFont(),26));
-		
-		lblBalance = new Label(group, SWT.LEFT);
-		lblBalance.setSize(225, 74);
-		lblBalance.setFont(Start.changeFontSize(this.getDisplay (),lblBalance.getFont(),22));
-		lblBalance.setBackground(Values.defaultBackground(getDisplay()));
-		
-		lblRequired = new Label(group, SWT.LEFT);
-		lblRequired.setSize(225, 100);
-		lblRequired.setFont(Start.changeFontSize(this.getDisplay (),lblRequired.getFont(),22));
-		lblRequired.setBackground(Values.defaultBackground(getDisplay()));
-		Label lblTitle = new Label(group, SWT.NONE);
-		lblTitle.setSize(225, 300);
-		lblTitle.setAlignment(SWT.CENTER);
-		lblTitle.setFont(SWTResourceManager.getFont("Ubuntu", 26, SWT.NORMAL));
-		lblTitle.setText("Cash Payment");
-		lblTitle.setBackground(Values.defaultBackground(getDisplay()));
 
 	}
 
