@@ -1,7 +1,9 @@
 package org.hc3;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
@@ -12,10 +14,10 @@ public class FlashingComposite extends Composite {
 	private boolean executeTimer = false;
 	private Control [] children = null;
 	private Color [] oldColors = null;
-	public FlashingComposite (Composite arg0, int arg1) {
+	private  FlashingComposite (Composite arg0, int arg1) {
 		super(arg0, arg1);
 	}
-	public FlashingComposite (Composite arg0, int arg1, Color defaultBackground, Color alternate) {
+	private FlashingComposite (Composite arg0, int arg1, Color defaultBackground, Color alternate) {
 		super(arg0, arg1);
 		defaultRGB = (defaultBackground != null) ? defaultBackground.getRGB() : this.getBackground().getRGB();
 		alternateRGB = alternate.getRGB();
@@ -55,5 +57,13 @@ public class FlashingComposite extends Composite {
 		executeTimer = false;
 		setBackground (new Color (getDisplay (), defaultRGB));
 	}
-	
+	public static FlashingComposite setUpFlashingSlot (final Composite parent) {
+		FlashingComposite fc = new FlashingComposite (parent, SWT.NO_SCROLL,Values.defaultBackground(parent.getDisplay()),new Color(parent.getDisplay (), Values.greenSecondary));
+		fc.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+		FillLayout layout = new FillLayout ();		
+		layout.marginHeight = 15;
+		layout.marginWidth  = 15;
+		fc.setLayout(layout);
+		return fc;
+	}
 }
