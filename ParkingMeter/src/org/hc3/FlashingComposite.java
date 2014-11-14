@@ -14,10 +14,10 @@ public class FlashingComposite extends Composite {
 	private boolean executeTimer = false;
 	private Control [] children = null;
 	private Color [] oldColors = null;
-	private  FlashingComposite (Composite arg0, int arg1) {
+	public  FlashingComposite (Composite arg0, int arg1) {
 		super(arg0, arg1);
 	}
-	private FlashingComposite (Composite arg0, int arg1, Color defaultBackground, Color alternate) {
+	public FlashingComposite (Composite arg0, int arg1, Color defaultBackground, Color alternate) {
 		super(arg0, arg1);
 		defaultRGB = (defaultBackground != null) ? defaultBackground.getRGB() : this.getBackground().getRGB();
 		alternateRGB = alternate.getRGB();
