@@ -1,6 +1,7 @@
 package org.hc3;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.MouseAdapter;
@@ -12,6 +13,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Table;
@@ -19,6 +21,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 import widgets.FlatButton;
+
 import org.hc3.Values;
 
 public class StartScreen extends Fragment implements Updateable {
@@ -45,6 +48,11 @@ public class StartScreen extends Fragment implements Updateable {
 		//Canvas drw = new Canvas (sashForm,SWT.NO_BACKGROUND);
 		/** Set up Buttons **/
 		
+		StyledText lblRefundInstructions = new StyledText (sashForm, SWT.NONE);
+		lblRefundInstructions.setText("Insert valid Ticket for refund, \n or purchase new ticket");
+		lblRefundInstructions.setBackground(Values.defaultBackground(getDisplay()));
+		lblRefundInstructions.setFont(Start.changeFontSize(this.getDisplay (),lblRefundInstructions.getFont(),24));
+		
 		
 		FlatButton fltbtnPurchaseButton = new FlatButton(sashForm, SWT.CENTER);
 		fltbtnPurchaseButton.addMouseListener(new MouseAdapter() {
@@ -53,23 +61,24 @@ public class StartScreen extends Fragment implements Updateable {
 				Start.startTimeSelectScreen ();
 			}
 		});
+		
 		fltbtnPurchaseButton.setBackground(new Color (this.getDisplay(),50,255,160));
 		fltbtnPurchaseButton.setForeground(this.getDisplay ().getSystemColor(SWT.COLOR_WHITE));
 		fltbtnPurchaseButton.setText(StartScreen.LocalValues.purchaseTicketButtonLabel);
 		fltbtnPurchaseButton.setFont(Start.changeFontSize(this.getDisplay (),fltbtnPurchaseButton.getFont(),32));
 		
-		FlatButton fltbtnRefundButton = new FlatButton(sashForm, SWT.CENTER);
-		fltbtnRefundButton.setBackground(new Color (this.getDisplay (),50,255,160));
-		fltbtnRefundButton.setForeground(this.getDisplay ().getSystemColor(SWT.COLOR_WHITE));
-		fltbtnRefundButton.setText(StartScreen.LocalValues.refundTicketButtonLabel);
-		fltbtnRefundButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseUp(MouseEvent e) {
-				Start.startRefundScreen(null);
-			}
-		});
-		fltbtnRefundButton.setFont(Start.changeFontSize(this.getDisplay (),fltbtnRefundButton.getFont(),32));
-			
+//		FlatButton fltbtnRefundButton = new FlatButton(sashForm, SWT.CENTER);
+//		fltbtnRefundButton.setBackground(new Color (this.getDisplay (),50,255,160));
+//		fltbtnRefundButton.setForeground(this.getDisplay ().getSystemColor(SWT.COLOR_WHITE));
+//		fltbtnRefundButton.setText(StartScreen.LocalValues.refundTicketButtonLabel);
+//		fltbtnRefundButton.addMouseListener(new MouseAdapter() {
+//			@Override
+//			public void mouseUp(MouseEvent e) {
+//				Start.startRefundScreen(null);
+//			}
+//		});
+//		fltbtnRefundButton.setFont(Start.changeFontSize(this.getDisplay (),fltbtnRefundButton.getFont(),32));
+//			
 		sashForm.setWeights(new int[] {3, 2, 2});
 	}
 	@Override
